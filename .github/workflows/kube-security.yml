@@ -34,21 +34,24 @@ jobs:
     - name: Deploy the application
       continue-on-error: true
       run: |
-         kubectl create deployment webserver --image=nginx --replicas=3      
-         kubectl describe deployment webserver
+         kubectl get namespaces
+         kubectl create namespace nginx
+         kubectl -n nginx create deployment webserver --image=nginx --replicas=3    
+         kubectl -n nginx describe deployment webserver
    
          kubectl get pods --all-namespaces
-         kubectl get pods 
+         kubectl -n nginx get pods
          sleep 20s 
-         kubectl get deployments.apps webserver
-         kubectl get pods
+         kubectl -n nginx get deployments.apps webserver
+         kubectl -n nginx get pods
          
          
     - name: Expose application
       continue-on-error: true
       run: |   
-        kubectl expose deployment webserver --name=my-dep1-svc --type=NodePort --port=9092
-        kubectl get svc my-dep1-svc
+        kubectl -n nginx expose deployment webserver --name=my-dep1-svc --type=NodePort --port=9092
+        kubectl -n nginx get svc my-dep1-svc
+        minikube service my-dep1-svc --url
         
     
     - name: Setting up vulnerable kubernetes-goat
