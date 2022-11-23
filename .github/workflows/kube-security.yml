@@ -1,4 +1,4 @@
-name: Kubernetes Scan 
+name: Kubernetes Vulnerabilities Scanning
 on:
   push:
   workflow_dispatch:
@@ -29,31 +29,27 @@ jobs:
          kubectl cluster-info
          kubectl get nodes   
          echo "name of the pods: "
-         kubectl get namespace default
+         kubectl create namespace nginx
+         kubectl get namespace nginx
          
     - name: Deploy the application
       continue-on-error: true
       run: |
          kubectl get namespaces
-         kubectl create namespace nginx
          kubectl -n nginx create deployment webserver --image=nginx --replicas=3    
-         kubectl -n nginx describe deployment webserver
-   
+         kubectl -n nginx describe deployment webserver  
          kubectl get pods --all-namespaces
          kubectl -n nginx get pods
          sleep 20s 
          kubectl -n nginx get deployments.apps webserver
-         kubectl -n nginx get pods
-         
+         kubectl -n nginx get pods    
          
     - name: Expose application
       continue-on-error: true
       run: |   
         kubectl -n nginx expose deployment webserver --name=my-dep1-svc --type=NodePort --port=9092
         kubectl -n nginx get svc my-dep1-svc
-        minikube service my-dep1-svc --url
         
-    
     - name: Setting up vulnerable kubernetes-goat
       continue-on-error: true
       run: |  
@@ -66,7 +62,6 @@ jobs:
         sleep 20s
         kubectl get pods
         
-   
     - name: Run Kube-bench & kubescape
       continue-on-error: true
 
